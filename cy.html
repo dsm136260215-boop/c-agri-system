@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>长鹰数字农业 · 云账</title>
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+body{
+  background:#f5f7fa;
+  display:flex;
+  height:100vh;
+}
+
+/* 登录弹窗样式 */
+.login-modal{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  display:none;
+}
+.login-box{
+  background:#fff;
+  border-radius:16px;
+  padding:48px;
+  width:420px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.15);
+  position:relative;
+}
+.login-box .close-btn{
+  position:absolute;
+  top:16px;
+  right:16px;
+  font-size:20px;
+  color:#94a3b8;
+  cursor:pointer;
+}
+.login-box h2{
+  text-align:center;
+  margin-bottom:32px;
+  color:#1e40af;
+  font-size:24px;
+  font-weight:600;
+}
+.login-form{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+.login-form input{
+  padding:14px 16px;
+  border:1px solid #e2e8f0;
+  border-radius:10px;
+  font-size:15px;
+  transition:all 0.3s;
+}
+.login-form input:focus{
+  outline:none;
+  border-color:#3b82f6;
+  box-shadow:0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+.login-form button{
+  padding:14px;
+  background:linear-gradient(135deg, #1e40af, #3b82f6);
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-weight:bold;
+  font-size:15px;
+  cursor:pointer;
+  transition:all 0.3s;
+}
+.login-form button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 16px rgba(59, 130, 246, 0.25);
+}
+
+/* 左侧导航栏 */
+.sidebar{
+  width:240px;
+  background:#1e293b;
+  color:#cbd5e1;
+  display:flex;
+  flex-direction:column;
+  box-shadow:2px 0 12px rgba(0,0,0,0.08);
+}
+.sidebar .logo{
+  padding:28px 24px;
+  font-size:20px;
+  font-weight:bold;
+  color:#fff;
+  border-bottom:1px solid #334155;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.sidebar .logo i{
+  font-size:24px;
+  color:#3b82f6;
+}
+.sidebar .menu-item{
+  padding:18px 24px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  cursor:pointer;
+  transition:0.3s;
+  font-size:15px;
+}
+.sidebar .menu-item:hover{
+  background:#334155;
+}
+.sidebar .menu-item.active{
+  background:#1e40af;
+  color:#fff;
+  border-left:4px solid #3b82f6;
+}
+.sidebar .menu-item i{
+  width:22px;
+  text-align:center;
+  font-size:18px;
+}
+
+/* 主内容区 */
+.main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:auto;
+}
+/* 顶部栏 */
+.topbar{
+  height:70px;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 32px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.05);
+}
+.topbar .title{
+  font-size:18px;
+  font-weight:600;
+  color:#1e293b;
+}
+.topbar .user-area{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.topbar .user-btn{
+  padding:8px 16px;
+  background:#3b82f6;
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:14px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.topbar .user-info{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  display:none;
+}
+.topbar .user-info.show{
+  display:flex;
+}
+.topbar .user-info img{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:#e2e8f0;
+}
+.topbar .logout-btn{
+  color:#ef4444;
+  cursor:pointer;
+  font-size:14px;
+}
+
+/* 内容区 */
+.content{
+  padding:32px;
+}
+.page-title{
+  font-size:26px;
+  font-weight:600;
+  margin-bottom:32px;
+  color:#1e293b;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.page-title i{
+  color:#3b82f6;
+  font-size:28px;
+}
+
+/* 指标卡片 - 更精致的样式 */
+.cards{
+  display:grid;
+  grid-template-columns: repeat(3,1fr);
+  gap:24px;
+  margin-bottom:32px;
+}
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:28px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.06);
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  overflow:hidden;
+  transition:all 0.3s;
+}
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 8px 24px rgba(0,0,0,0.08);
+}
+.card::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:4px;
+  background:linear-gradient(90deg, #3b82f6, #1e40af);
+}
+.card .card-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+}
+.card .label{
+  font-size:15px;
+  color:#64748b;
+  font-weight:500;
+}
+.card .icon{
+  width:40px;
+  height:40px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  color:#fff;
+}
+.card.blue .icon{background:linear-gradient(135deg, #3b82f6, #60a5fa);}
+.card.orange .icon{background:linear-gradient(135deg, #f97316, #fb923c);}
+.card.green .icon{background:linear-gradient(135deg, #10b981, #34d399);}
+.card.purple .icon{background:linear-gradient(135deg, #8b5cf6, #a78bfa);}
+.card.yellow .icon{background:linear-gradient(135deg, #eab308, #facc15);}
+.card.red .icon{background:linear-gradient(135deg, #ef4444, #f87171);}
+.card .value{
+  font-size:32px;
+  font-weight:700;
+  color:#1e293b;
+  margin-bottom:8px;
+}
+.card .trend{
+  font-size:14px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.card .trend.up{
+  color:#10b981;
+}
+.card .trend.down{
+  color:#ef4444;
+}
+
+/* 图表区 */
+.charts{
+  display:grid;
+  grid-template-columns: 2fr 1fr;
+  gap:24px;
+  margin-bottom:32px;
+}
+.chart-box{
+  background:#fff;
+  border-radius:16px;
+  padding:24px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.06);
+}
+.chart-box h3{
+  font-size:18px;
+  font-weight:600;
+  margin-bottom:20px;
+  color:#1e293b;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.chart-box h3 i{
+  color:#3b82f6;
+}
+.chart-box canvas{
+  width:100%;
+  height:300px;
+}
+
+/* 底部明细列表 - 可展开收起 */
+.detail-section{
+  background:#fff;
+  border-radius:16px;
+  padding:24px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.06);
+}
+.detail-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+  cursor:pointer;
+}
+.detail-header h3{
+  font-size:18px;
+  font-weight:600;
+  color:#1e293b;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.detail-header h3 i{
+  color:#3b82f6;
+}
+.detail-header .toggle-btn{
+  color:#3b82f6;
+  font-size:14px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.detail-content{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height 0.5s ease;
+}
+.detail-content.show{
+  max-height:800px;
+}
+.table-box{
+  width:100%;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+th{
+  text-align:left;
+  padding:16px;
+  color:#64748b;
+  font-weight:600;
+  font-size:14px;
+  border-bottom:2px solid #e2e8f0;
+  background:#f8fafc;
+}
+td{
+  padding:16px;
+  border-bottom:1px solid #f1f5f9;
+  font-size:14px;
+  color:#334155;
+}
+tr:hover td{
+  background:#f8fafc;
+}
+
+/* 其他页面通用样式 */
+.form{
+  background:#fff;
+  border-radius:16px;
+  padding:28px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.06);
+  margin-bottom:32px;
+  display:grid;
+  grid-template-columns: repeat(2,1fr);
+  gap:20px;
+}
+.form input, .form select{
+  padding:14px 16px;
+  border:1px solid #e2e8f0;
+  border-radius:10px;
+  font-size:15px;
+  transition:all 0.3s;
+}
+.form input:focus, .form select:focus{
+  outline:none;
+  border-color:#3b82f6;
+  box-shadow:0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+.form .full{
+  grid-column:span 2;
+}
+.btn-submit{
+  padding:14px;
+  background:linear-gradient(135deg, #1e40af, #3b82f6);
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-size:15px;
+  font-weight:bold;
+  cursor:pointer;
+  transition:all 0.3s;
+}
+.btn-submit:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 16px rgba(59, 130, 246, 0.25);
+}
+.btn-operation{
+  padding:8px 14px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  margin:0 4px;
+  font-size:13px;
+  transition:all 0.2s;
+}
+.btn-operation:hover{
+  transform:translateY(-1px);
+}
+.btn-in{
+  background:#10b981;
+  color:#fff;
+}
+.btn-out{
+  background:#ef4444;
+  color:#fff;
+}
+
+/* 页面切换 */
+.page{
+  display:none;
+}
+.page.active{
+  display:block;
+}
+
+/* 库存分类标签 */
+.tag{
+  padding:6px 10px;
+  border-radius:6px;
+  font-size:13px;
+  color:#fff;
+  font-weight:500;
+}
+.tag-material{
+  background:#3b82f6;
+}
+.tag-product{
+  background:#10b981;
+}
+
+/* 响应式适配 */
+@media (max-width: 1200px) {
+  .cards{
+    grid-template-columns: repeat(2,1fr);
+  }
+  .charts{
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 768px) {
+  .cards{
+    grid-template-columns: 1fr;
+  }
+  .sidebar{
+    width:200px;
+  }
+  .content{
+    padding:16px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- 登录弹窗 -->
+<div class="login-modal" id="loginModal">
+  <div class="login-box">
+    <i class="fa-solid fa-xmark close-btn" onclick="closeLogin()"></i>
+    <h2>长鹰数字农业 · 云账</h2>
+    <div class="login-form">
+      <input type="text" id="username" placeholder="用户名" value="admin">
+      <input type="password" id="password" placeholder="密码" value="123456">
+      <button onclick="login()">登录系统</button>
+    </div>
+  </div>
+</div>
+
+<!-- 左侧导航 -->
+<div class="sidebar">
+  <div class="logo">
+    <i class="fa-solid fa-leaf"></i>
+    <span>长鹰数字农业 · 云账</span>
+  </div>
+  <div class="menu-item active" onclick="goPage('home')">
+    <i class="fa-solid fa-chart-line"></i>
+    <span>数据总览</span>
+  </div>
+  <div class="menu-item" onclick="goPage('buy')">
+    <i class="fa-solid fa-truck-fast"></i>
+    <span>采购管理</span>
+  </div>
+  <div class="menu-item" onclick="goPage('sale')">
+    <i class="fa-solid fa-hand-holding-dollar"></i>
+    <span>销售管理</span>
+  </div>
+  <div class="menu-item" onclick="goPage('stock')">
+    <i class="fa-solid fa-boxes-stacked"></i>
+    <span>库存管理</span>
+  </div>
+  <div class="menu-item" onclick="goPage('receivable')">
+    <i class="fa-solid fa-file-invoice-dollar"></i>
+    <span>应收账款</span>
+  </div>
+  <div class="menu-item" onclick="goPage('payable')">
+    <i class="fa-solid fa-money-bill-transfer"></i>
+    <span>应付账款</span>
+  </div>
+  <div class="menu-item" onclick="goPage('profit')">
+    <i class="fa-solid fa-coins"></i>
+    <span>经营利润</span>
+  </div>
+</div>
+
+<!-- 主内容区 -->
+<div class="main">
+  <!-- 顶部栏 -->
+  <div class="topbar">
+    <div class="title">2026 年度经营管理系统</div>
+    <div class="user-area">
+      <button class="user-btn" id="loginBtn" onclick="openLogin()">
+        <i class="fa-solid fa-user"></i>
+        <span>管理员登录</span>
+      </button>
+      <div class="user-info" id="userInfo">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI1MCIgZmlsbD0iIzFlNDBhZiIvPjx0ZXh0IHg9IjUwIiB5PSI2NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjQwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+VTwvdGV4dD48L3N2Zz4=" alt="用户头像">
+        <span>管理员</span>
+        <span class="logout-btn" onclick="logout()">退出</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 内容区 -->
+  <div class="content">
+    <!-- 1. 数据总览（首页） -->
+    <div id="home" class="page active">
+      <div class="page-title">
+        <i class="fa-solid fa-house-chimney"></i>
+        2026 经营总览
+      </div>
+
+      <!-- 指标卡片 - 精致版 -->
+      <div class="cards">
+        <div class="card blue">
+          <div class="card-header">
+            <div class="label">年度销售额</div>
+            <div class="icon"><i class="fa-solid fa-sack-dollar"></i></div>
+          </div>
+          <div class="value" id="yearSale">0.00</div>
+          <div class="trend up">
+            <i class="fa-solid fa-arrow-up"></i>
+            <span>较上月增长 12.5%</span>
+          </div>
+        </div>
+        <div class="card orange">
+          <div class="card-header">
+            <div class="label">年度采购额</div>
+            <div class="icon"><i class="fa-solid fa-truck-fast"></i></div>
+          </div>
+          <div class="value" id="yearPurchase">0.00</div>
+          <div class="trend down">
+            <i class="fa-solid fa-arrow-down"></i>
+            <span>较上月下降 8.2%</span>
+          </div>
+        </div>
+        <div class="card green">
+          <div class="card-header">
+            <div class="label">库存总额</div>
+            <div class="icon"><i class="fa-solid fa-boxes"></i></div>
+          </div>
+          <div class="value" id="stockMoney">0.00</div>
+          <div class="trend up">
+            <i class="fa-solid fa-arrow-up"></i>
+            <span>较上月增长 5.3%</span>
+          </div>
+        </div>
+        <div class="card purple">
+          <div class="card-header">
+            <div class="label">应收账款</div>
+            <div class="icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+          </div>
+          <div class="value" id="yueMoney">0.00</div>
+          <div class="trend up">
+            <i class="fa-solid fa-arrow-up"></i>
+            <span>较上月增长 3.8%</span>
+          </div>
+        </div>
+        <div class="card yellow">
+          <div class="card-header">
+            <div class="label">应付账款</div>
+            <div class="icon"><i class="fa-solid fa-money-bill-transfer"></i></div>
+          </div>
+          <div class="value" id="payMoney">0.00</div>
+          <div class="trend down">
+            <i class="fa-solid fa-arrow-down"></i>
+            <span>较上月下降 10.1%</span>
+          </div>
+        </div>
+        <div class="card red">
+          <div class="card-header">
+            <div class="label">利润总额</div>
+            <div class="icon"><i class="fa-solid fa-coins"></i></div>
+          </div>
+          <div class="value" id="profitMoney">0.00</div>
+          <div class="trend up">
+            <i class="fa-solid fa-arrow-up"></i>
+            <span>较上月增长 18.7%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 图表区 -->
+      <div class="charts">
+        <div class="chart-box">
+          <h3>
+            <i class="fa-solid fa-chart-line"></i>
+            月度销售趋势
+          </h3>
+          <canvas id="saleTrend"></canvas>
+        </div>
+        <div class="chart-box">
+          <h3>
+            <i class="fa-solid fa-chart-pie"></i>
+            销售结构占比
+          </h3>
+          <canvas id="pieChart"></canvas>
+        </div>
+      </div>
+
+      <!-- 底部明细列表 - 可展开/收起 -->
+      <div class="detail-section">
+        <div class="detail-header" onclick="toggleDetail()">
+          <h3>
+            <i class="fa-solid fa-list"></i>
+            近期经营明细
+          </h3>
+          <div class="toggle-btn" id="toggleBtn">
+            <i class="fa-solid fa-chevron-down"></i>
+            <span>展开明细</span>
+          </div>
+        </div>
+        <div class="detail-content" id="detailContent">
+          <div class="table-box">
+            <table>
+              <thead>
+                <tr>
+                  <th>类型</th>
+                  <th>产品名称</th>
+                  <th>往来单位</th>
+                  <th>日期</th>
+                  <th>金额(元)</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="detailTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 采购管理 -->
+    <div id="buy" class="page">
+      <div class="page-title">
+        <i class="fa-solid fa-truck-fast"></i>
+        采购管理
+      </div>
+      <div class="form">
+        <input id="pName" placeholder="产品名称">
+        <input id="pGuige" placeholder="规格">
+        <input id="pSupplier" placeholder="供货方">
+        <input id="pDate" type="date" placeholder="采购日期">
+        <input id="pInPrice" type="number" placeholder="进货单价">
+        <input id="pNum" type="number" placeholder="数量">
+        <select id="pPayStatus" class="full">
+          <option value="">请选择付款状况</option>
+          <option value="已付款">已付款</option>
+          <option value="未付款">未付款</option>
+          <option value="部分付款">部分付款</option>
+        </select>
+        <input class="full" id="pRemark" placeholder="备注">
+        <button class="full btn-submit" onclick="savePurchase()">确认</button>
+      </div>
+      <div class="table-box">
+        <table>
+          <thead>
+            <tr>
+              <th>产品名称</th>
+              <th>规格</th>
+              <th>供货方</th>
+              <th>采购日期</th>
+              <th>单价</th>
+              <th>数量</th>
+              <th>金额</th>
+              <th>付款状况</th>
+            </tr>
+          </thead>
+          <tbody id="purchaseTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3. 销售管理 -->
+    <div id="sale" class="page">
+      <div class="page-title">
+        <i class="fa-solid fa-hand-holding-dollar"></i>
+        销售管理
+      </div>
+      <div class="form">
+        <input id="sName" placeholder="产品名称">
+        <input id="sGuige" placeholder="规格">
+        <input id="sCustomer" placeholder="客户">
+        <input id="sDate" type="date" placeholder="销售日期">
+        <input id="sOutPrice" type="number" placeholder="销售单价">
+        <input id="sNum" type="number" placeholder="数量">
+        <input id="sYue" type="number" placeholder="欠款金额">
+        <select id="sPayStatus" class="full">
+          <option value="">请选择回款状况</option>
+          <option value="已回款">已回款</option>
+          <option value="未回款">未回款</option>
+          <option value="部分回款">部分回款</option>
+        </select>
+        <button class="full btn-submit" onclick="saveSale()">确认</button>
+      </div>
+      <div class="table-box">
+        <table>
+          <thead>
+            <tr>
+              <th>产品名称</th>
+              <th>规格</th>
+              <th>客户</th>
+              <th>销售日期</th>
+              <th>单价</th>
+              <th>数量</th>
+              <th>金额</th>
+              <th>欠款金额</th>
+              <th>回款状况</th>
+            </tr>
+          </thead>
+          <tbody id="saleTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 4. 库存管理 -->
+    <div id="stock" class="page">
+      <div class="page-title">
+        <i class="fa-solid fa-boxes-stacked"></i>
+        库存管理
+      </div>
+      <div class="form">
+        <input id="stName" placeholder="产品名称">
+        <input id="stGuige" placeholder="规格">
+        <select id="stType" class="full">
+          <option value="">请选择库存类型</option>
+          <option value="原料">原料</option>
+          <option value="产成品">产成品</option>
+        </select>
+        <input id="stNum" type="number" placeholder="数量">
+        <input id="stPrice" type="number" placeholder="单价">
+        <div class="full" style="display:flex;gap:16px;">
+          <button class="btn-submit" style="flex:1;" onclick="stockIn()">确认入库</button>
+          <button class="btn-submit" style="flex:1;background:linear-gradient(135deg, #ef4444, #f87171);" onclick="stockOut()">确认出库</button>
+        </div>
+      </div>
+      <div class="table-box">
+        <table>
+          <thead>
+            <tr>
+              <th>品名</th>
+              <th>规格</th>
+              <th>库存类型</th>
+              <th>库存数量</th>
+              <th>单价</th>
+              <th>库存金额</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="stockTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 5. 应收账款 -->
+    <div id="receivable" class="page">
+      <div class="page-title">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+        应收账款
+      </div>
+      <div class="table-box">
+        <table>
+          <thead>
+            <tr>
+              <th>客户名称</th>
+              <th>欠款金额</th>
+              <th>欠款日期</th>
+              <th>回款状况</th>
+              <th>逾期天数</th>
+            </tr>
+          </thead>
+          <tbody id="receivableTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 6. 应付账款 -->
+    <div id="payable" class="page">
+      <div class="page-title">
+        <i class="fa-solid fa-money-bill-transfer"></i>
+        应付账款
+      </div>
+      <div class="table-box">
+        <table>
+          <thead>
+            <tr>
+              <th>供货方名称</th>
+              <th>应付金额</th>
+              <th>采购日期</th>
+              <th>付款状况</th>
+              <th>逾期天数</th>
+            </tr>
+          </thead>
+          <tbody id="payableTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 7. 经营利润 -->
+    <div id="profit" class="page">
+      <div class="page-title">
+        <i class="fa-solid fa-coins"></i>
+        经营利润
+      </div>
+      <div class="table-box">
+        <table>
+          <thead>
+            <tr>
+              <th>月份</th>
+              <th>月度销售额</th>
+              <th>月度采购额</th>
+              <th>月度利润</th>
+            </tr>
+          </thead>
+          <tbody id="profitTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 全局数据存储
+let purchases = JSON.parse(localStorage.getItem('purchases')) || []
+let sales = JSON.parse(localStorage.getItem('sales')) || []
+let stocks = JSON.parse(localStorage.getItem('stocks')) || []
+let isLogin = false // 登录状态
+
+// 登录相关功能
+function openLogin() {
+  document.getElementById('loginModal').style.display = 'flex'
+}
+
+function closeLogin() {
+  document.getElementById('loginModal').style.display = 'none'
+}
+
+function login() {
+  const username = document.getElementById('username').value
+  const password = document.getElementById('password').value
+  
+  // 简单的管理员验证（可自行修改）
+  if (username === 'admin' && password === '123456') {
+    isLogin = true
+    closeLogin()
+    // 切换登录状态显示
+    document.getElementById('loginBtn').style.display = 'none'
+    document.getElementById('userInfo').classList.add('show')
+    // 加载数据
+    updateDash()
+    renderDetailTable()
+    alert('登录成功！')
+  } else {
+    alert('用户名或密码错误！默认账号：admin，密码：123456')
+  }
+}
+
+function logout() {
+  isLogin = false
+  // 切换登录状态显示
+  document.getElementById('loginBtn').style.display = 'flex'
+  document.getElementById('userInfo').classList.remove('show')
+  alert('已退出登录！')
+}
+
+// 页面切换
+function goPage(id) {
+  // 非登录状态下只能看首页
+  if (!isLogin && id !== 'home') {
+    alert('请先登录系统！')
+    openLogin()
+    return
+  }
+  
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
+  document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'))
+  
+  document.getElementById(id).classList.add('active')
+  document.querySelector(`.menu-item[onclick="goPage('${id}')"]`).classList.add('active')
+
+  // 加载对应页面数据
+  if (id === 'home') {
+    updateDash()
+    renderDetailTable()
+  }
+  if (id === 'buy') renderPurchaseTable()
+  if (id === 'sale') renderSaleTable()
+  if (id === 'stock') renderStock()
+  if (id === 'receivable') renderReceivable()
+  if (id === 'payable') renderPayable()
+  if (id === 'profit') renderProfit()
+}
+
+// 底部明细列表展开/收起
+function toggleDetail() {
+  const content = document.getElementById('detailContent')
+  const btn = document.getElementById('toggleBtn')
+  
+  if (content.classList.contains('show')) {
+    content.classList.remove('show')
+    btn.innerHTML = '<i class="fa-solid fa-chevron-down"></i><span>展开明细</span>'
+  } else {
+    content.classList.add('show')
+    btn.innerHTML = '<i class="fa-solid fa-chevron-up"></i><span>收起明细</span>'
+    // 确保数据已加载
+    renderDetailTable()
+  }
+}
+
+// 采购管理 - 保存采购记录
+function savePurchase() {
+  if (!isLogin) {
+    alert('请先登录系统！')
+    openLogin()
+    return
+  }
+  
+  let name = document.getElementById('pName').value
+  let guige = document.getElementById('pGuige').value
+  let supplier = document.getElementById('pSupplier').value
+  let date = document.getElementById('pDate').value
+  let inPrice = Number(document.getElementById('pInPrice').value) || 0
+  let num = Number(document.getElementById('pNum').value) || 0
+  let payStatus = document.getElementById('pPayStatus').value
+  let remark = document.getElementById('pRemark').value
+  
+  if (!name || !num || !date || !payStatus) { 
+    alert('请填写完整必填信息！'); 
+    return; 
+  }
+  
+  purchases.push({
+    name, guige, supplier, date, inPrice, num,
+    payStatus, remark,
+    money: (inPrice * num).toFixed(2),
+    month: new Date(date).getMonth() + 1,
+    type: '采购'
+  })
+  
+  localStorage.setItem('purchases', JSON.stringify(purchases))
+  alert('采购记录保存成功！')
+  
+  // 清空表单
+  document.querySelectorAll('#buy input, #buy select').forEach(i=>{
+    if(i.type !== 'button') i.value = ''
+  })
+  
+  goPage('buy')
+  updateDash()
+  renderDetailTable()
+}
+
+// 销售管理 - 保存销售记录
+function saveSale() {
+  if (!isLogin) {
+    alert('请先登录系统！')
+    openLogin()
+    return
+  }
+  
+  let name = document.getElementById('sName').value
+  let guige = document.getElementById('sGuige').value
+  let customer = document.getElementById('sCustomer').value
+  let date = document.getElementById('sDate').value
+  let outPrice = Number(document.getElementById('sOutPrice').value) || 0
+  let num = Number(document.getElementById('sNum').value) || 0
+  let yue = Number(document.getElementById('sYue').value) || 0
+  let payStatus = document.getElementById('sPayStatus').value
+  
+  if (!name || !num || !date || !payStatus) { 
+    alert('请填写完整必填信息！'); 
+    return; 
+  }
+  
+  sales.push({
+    name, guige, customer, date, outPrice, num,
+    yue, payStatus,
+    money: (outPrice * num).toFixed(2),
+    month: new Date(date).getMonth() + 1,
+    type: '销售'
+  })
+  
+  localStorage.setItem('sales', JSON.stringify(sales))
+  alert('销售记录保存成功！')
+  
+  // 清空表单
+  document.querySelectorAll('#sale input, #sale select').forEach(i=>{
+    if(i.type !== 'button') i.value = ''
+  })
+  
+  goPage('sale')
+  updateDash()
+  renderDetailTable()
+}
+
+// 库存管理 - 入库
+function stockIn() {
+  if (!isLogin) {
+    alert('请先登录系统！')
+    openLogin()
+    return
+  }
+  
+  let name = document.getElementById('stName').value
+  let guige = document.getElementById('stGuige').value
+  let type = document.getElementById('stType').value
+  let num = Number(document.getElementById('stNum').value) || 0
+  let price = Number(document.getElementById('stPrice').value) || 0
+  
+  if (!name || !type || !num) { 
+    alert('请填写完整必填信息！'); 
+    return; 
+  }
+  
+  const key = `${name}_${guige}_${type}`
+  
+  // 检查是否已有该库存
+  let exists = stocks.find(item => item.key === key)
+  if (exists) {
+    exists.num += num
+    exists.price = price // 更新单价
+  } else {
+    stocks.push({
+      key, name, guige, type, num, price,
+      money: (num * price).toFixed(2)
+    })
+  }
+  
+  localStorage.setItem('stocks', JSON.stringify(stocks))
+  alert('入库成功！')
+  
+  // 清空表单
+  document.querySelectorAll('#stock input, #stock select').forEach(i=>{
+    if(i.type !== 'button') i.value = ''
+  })
+  
+  goPage('stock')
+  updateDash()
+}
+
+// 库存管理 - 出库
+function stockOut() {
+  if (!isLogin) {
+    alert('请先登录系统！')
+    openLogin()
+    return
+  }
+  
+  let name = document.getElementById('stName').value
+  let guige = document.getElementById('stGuige').value
+  let type = document.getElementById('stType').value
+  let num = Number(document.getElementById('stNum').value) || 0
+  
+  if (!name || !type || !num) { 
+    alert('请填写完整必填信息！'); 
+    return; 
+  }
+  
+  const key = `${name}_${guige}_${type}`
+  
+  // 检查是否已有该库存
+  let exists = stocks.find(item => item.key === key)
+  if (!exists) {
+    alert('该库存不存在！')
+    return
+  }
+  
+  if (exists.num < num) {
+    alert('库存不足！当前库存：' + exists.num)
+    return
+  }
+  
+  exists.num -= num
+  exists.money = (exists.num * exists.price).toFixed(2)
+  
+  // 如果库存为0，删除该记录
+  if (exists.num <= 0) {
+    stocks = stocks.filter(item => item.key !== key)
+  }
+  
+  localStorage.setItem('stocks', JSON.stringify(stocks))
+  alert('出库成功！')
+  
+  // 清空表单
+  document.querySelectorAll('#stock input, #stock select').forEach(i=>{
+    if(i.type !== 'button') i.value = ''
+  })
+  
+  goPage('stock')
+  updateDash()
+}
+
+// 渲染采购表格
+function renderPurchaseTable() {
+  let html = ''
+  purchases.forEach(p => {
+    html += `<tr>
+      <td>${p.name}</td>
+      <td>${p.guige}</td>
+      <td>${p.supplier}</td>
+      <td>${p.date}</td>
+      <td>${p.inPrice}</td>
+      <td>${p.num}</td>
+      <td>${p.money}</td>
+      <td>${p.payStatus}</td>
+    </tr>`
+  })
+  document.getElementById('purchaseTable').innerHTML = html
+}
+
+// 渲染销售表格
+function renderSaleTable() {
+  let html = ''
+  sales.forEach(s => {
+    html += `<tr>
+      <td>${s.name}</td>
+      <td>${s.guige}</td>
+      <td>${s.customer}</td>
+      <td>${s.date}</td>
+      <td>${s.outPrice}</td>
+      <td>${s.num}</td>
+      <td>${s.money}</td>
+      <td>${s.yue}</td>
+      <td>${s.payStatus}</td>
+    </tr>`
+  })
+  document.getElementById('saleTable').innerHTML = html
+}
+
+// 渲染库存表格
+function renderStock() {
+  let html = ''
+  stocks.forEach(s => {
+    let tagClass = s.type === '原料' ? 'tag-material' : 'tag-product'
+    html += `<tr>
+      <td>${s.name}</td>
+      <td>${s.guige}</td>
+      <td><span class="tag ${tagClass}">${s.type}</span></td>
+      <td>${s.num}</td>
+      <td>${s.price}</td>
+      <td>${s.money}</td>
+      <td>
+        <button class="btn-operation btn-in" onclick="editStock('${s.key}', 'in')">入库</button>
+        <button class="btn-operation btn-out" onclick="editStock('${s.key}', 'out')">出库</button>
+      </td>
+    </tr>`
+  })
+  document.getElementById('stockTable').innerHTML = html
+}
+
+// 编辑库存（快速入库/出库）
+function editStock(key, type) {
+  let stock = stocks.find(item => item.key === key)
+  if (!stock) return
+  
+  document.getElementById('stName').value = stock.name
+  document.getElementById('stGuige').value = stock.guige
+  document.getElementById('stType').value = stock.type
+  document.getElementById('stPrice').value = stock.price
+  
+  if (type === 'in') {
+    document.getElementById('stNum').focus()
+  } else {
+    document.getElementById('stNum').value = ''
+    document.getElementById('stNum').focus()
+  }
+}
+
+// 渲染应收账款
+function renderReceivable() {
+  let html = ''
+  sales.forEach(s => {
+    if (s.yue > 0 && s.payStatus !== '已回款') {
+      // 计算逾期天数
+      let saleDate = new Date(s.date)
+      let today = new Date()
+      let overdueDays = Math.floor((today - saleDate) / (1000 * 60 * 60 * 24))
+      
+      html += `<tr>
+        <td>${s.customer}</td>
+        <td>${s.yue}</td>
+        <td>${s.date}</td>
+        <td>${s.payStatus}</td>
+        <td>${overdueDays > 30 ? `<span style="color:red">${overdueDays}</span>` : overdueDays}</td>
+      </tr>`
+    }
+  })
+  document.getElementById('receivableTable').innerHTML = html
+}
+
+// 渲染应付账款
+function renderPayable() {
+  let html = ''
+  purchases.forEach(p => {
+    if (p.payStatus !== '已付款') {
+      // 计算逾期天数
+      let buyDate = new Date(p.date)
+      let today = new Date()
+      let overdueDays = Math.floor((today - buyDate) / (1000 * 60 * 60 * 24))
+      
+      html += `<tr>
+        <td>${p.supplier}</td>
+        <td>${p.money}</td>
+        <td>${p.date}</td>
+        <td>${p.payStatus}</td>
+        <td>${overdueDays > 30 ? `<span style="color:red">${overdueDays}</span>` : overdueDays}</td>
+      </tr>`
+    }
+  })
+  document.getElementById('payableTable').innerHTML = html
+}
+
+// 渲染经营利润
+function renderProfit() {
+  let s = [0,0,0,0,0,0,0,0,0,0,0,0]
+  let b = [0,0,0,0,0,0,0,0,0,0,0,0]
+  
+  sales.forEach(x => s[x.month-1] += parseFloat(x.money))
+  purchases.forEach(x => b[x.month-1] += parseFloat(x.money))
+
+  let html = '', ts=0, tb=0, tp=0
+  for(let m=0;m<12;m++){
+    let profit = s[m] - b[m]
+    ts += s[m]
+    tb += b[m]
+    tp += profit
+    html += `<tr>
+      <td>${m+1}月</td>
+      <td>${s[m].toFixed(2)}</td>
+      <td>${b[m].toFixed(2)}</td>
+      <td style='color:${profit>=0?"#1e88e5":"red"}'>${profit.toFixed(2)}</td>
+    </tr>`
+  }
+  
+  html += `<tr style='font-weight:bold;color:#1e40af;background:#f0f7ff'>
+    <td>全年合计</td>
+    <td>${ts.toFixed(2)}</td>
+    <td>${tb.toFixed(2)}</td>
+    <td>${tp.toFixed(2)}</td>
+  </tr>`
+  
+  document.getElementById('profitTable').innerHTML = html
+  document.getElementById('profitMoney').innerText = tp.toFixed(2)
+}
+
+// 渲染首页底部明细列表
+function renderDetailTable() {
+  if (!isLogin) return
+  
+  // 合并采购和销售数据
+  let allData = [...purchases, ...sales]
+  
+  // 按日期排序（最新的在前）
+  allData.sort((a, b) => new Date(b.date) - new Date(a.date))
+  
+  // 只显示最近20条
+  let recentData = allData.slice(0, 20)
+  
+  let html = ''
+  recentData.forEach(item => {
+    let typeIcon = item.type === '采购' ? '<i class="fa-solid fa-truck-fast" style="color:#f97316;"></i>' : '<i class="fa-solid fa-hand-holding-dollar" style="color:#3b82f6;"></i>'
+    let unit = item.supplier || item.customer || '-'
+    let status = item.payStatus || '-'
+    let statusColor = status.includes('已') ? 'color:#10b981;' : status.includes('未') ? 'color:#ef4444;' : 'color:#eab308;'
+    
+    html += `<tr>
+      <td>${typeIcon} ${item.type}</td>
+      <td>${item.name}(${item.guige})</td>
+      <td>${unit}</td>
+      <td>${item.date}</td>
+      <td>${item.money}</td>
+      <td style="${statusColor}">${status}</td>
+      <td>
+        <button class="btn-operation" style="background:#3b82f6;color:#fff;" onclick="viewDetail('${item.type}', '${item.name}', '${item.date}')">查看</button>
+      </td>
+    </tr>`
+  })
+  
+  document.getElementById('detailTable').innerHTML = html
+}
+
+// 查看明细详情
+function viewDetail(type, name, date) {
+  alert(`查看 ${type} 详情：\n产品：${name}\n日期：${date}\n\n可在此处扩展详情查看功能`)
+}
+
+// 更新数据总览
+function updateDash() {
+  if (!isLogin) return
+  
+  // 年度销售额
+  let yearSale = 0
+  sales.forEach(s => yearSale += parseFloat(s.money))
+  
+  // 年度采购额
+  let yearPurchase = 0
+  purchases.forEach(p => yearPurchase += parseFloat(p.money))
+  
+  // 库存总额
+  let stockMoney = 0
+  stocks.forEach(s => stockMoney += parseFloat(s.money))
+  
+  // 应收账款
+  let yueMoney = 0
+  sales.forEach(s => yueMoney += parseFloat(s.yue))
+  
+  // 应付账款
+  let payMoney = 0
+  purchases.forEach(p => {
+    if (p.payStatus !== '已付款') {
+      payMoney += parseFloat(p.money)
+    }
+  })
+  
+  // 利润总额
+  let profitMoney = yearSale - yearPurchase
+  
+  // 更新数值显示
+  document.getElementById('yearSale').innerText = yearSale.toFixed(2)
+  document.getElementById('yearPurchase').innerText = yearPurchase.toFixed(2)
+  document.getElementById('stockMoney').innerText = stockMoney.toFixed(2)
+  document.getElementById('yueMoney').innerText = yueMoney.toFixed(2)
+  document.getElementById('payMoney').innerText = payMoney.toFixed(2)
+  document.getElementById('profitMoney').innerText = profitMoney.toFixed(2)
+
+  // 销售趋势图
+  let saleByMonth = [0,0,0,0,0,0,0,0,0,0,0,0]
+  sales.forEach(s => saleByMonth[s.month-1] += parseFloat(s.money))
+  drawTrend('saleTrend', saleByMonth, '#3b82f6')
+
+  // 饼图（销售结构）
+  let productSales = {}
+  sales.forEach(s => {
+    if (!productSales[s.name]) {
+      productSales[s.name] = 0
+    }
+    productSales[s.name] += parseFloat(s.money)
+  })
+  
+  let pieData = []
+  Object.keys(productSales).forEach(name => {
+    pieData.push({name, val: productSales[name]})
+  })
+  
+  // 如果没有数据，显示默认数据
+  if (pieData.length === 0) {
+    pieData = [
+      {name: '尿素', val: 40},
+      {name: '复合肥', val: 30},
+      {name: '钾肥', val: 20},
+      {name: '其他', val: 10}
+    ]
+  }
+  
+  drawPie('pieChart', pieData)
+}
+
+// 绘制趋势图
+function drawTrend(canvasId, data, color) {
+  const ctx = document.getElementById(canvasId).getContext('2d')
+  ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height)
+  
+  const w = ctx.canvas.width, h = ctx.canvas.height
+  const max = Math.max(...data) || 10
+  const pad = 40
+
+  // 绘制网格线
+  ctx.strokeStyle = '#f1f5f9'
+  ctx.lineWidth = 1
+  for(let i=0; i<6; i++) {
+    ctx.beginPath()
+    ctx.moveTo(pad, pad + (h-2*pad)*i/5)
+    ctx.lineTo(w-pad, pad + (h-2*pad)*i/5)
+    ctx.stroke()
+  }
+  
+  // 绘制趋势线
+  ctx.beginPath()
+  ctx.strokeStyle = color
+  ctx.lineWidth = 3
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
+  
+  // 填充渐变区域
+  ctx.fillStyle = ctx.createLinearGradient(0, pad, 0, h-pad)
+  ctx.fillStyle.addColorStop(0, `${color}33`)
+  ctx.fillStyle.addColorStop(1, `${color}00`)
+  
+  ctx.moveTo(pad, h-pad)
+  data.forEach((val,i)=>{
+    const x = pad + (w-2*pad)*i/11
+    const y = h - pad - (h-2*pad)*(val/max)
+    i==0 ? ctx.lineTo(x,y) : ctx.lineTo(x,y)
+  })
+  ctx.lineTo(pad + (w-2*pad)*11/11, h-pad)
+  ctx.closePath()
+  ctx.fill()
+  
+  // 绘制线条
+  ctx.beginPath()
+  ctx.strokeStyle = color
+  data.forEach((val,i)=>{
+    const x = pad + (w-2*pad)*i/11
+    const y = h - pad - (h-2*pad)*(val/max)
+    i==0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y)
+  })
+  ctx.stroke()
+
+  // 绘制数据点
+  data.forEach((val,i)=>{
+    const x = pad + (w-2*pad)*i/11
+    const y = h - pad - (h-2*pad)*(val/max)
+    
+    // 外圆
+    ctx.beginPath()
+    ctx.strokeStyle = color
+    ctx.fillStyle = '#fff'
+    ctx.lineWidth = 2
+    ctx.arc(x,y,6,0,Math.PI*2)
+    ctx.fill()
+    ctx.stroke()
+    
+    // 内圆
+    ctx.beginPath()
+    ctx.fillStyle = color
+    ctx.arc(x,y,3,0,Math.PI*2)
+    ctx.fill()
+  })
+  
+  // 绘制月份标签
+  ctx.fillStyle = '#64748b'
+  ctx.font = '14px Microsoft YaHei'
+  ctx.textAlign = 'center'
+  for(let i=0; i<12; i++) {
+    const x = pad + (w-2*pad)*i/11
+    ctx.fillText(`${i+1}月`, x, h - 15)
+  }
+  
+  // 绘制数值标签
+  ctx.textAlign = 'right'
+  for(let i=0; i<6; i++) {
+    const y = pad + (h-2*pad)*i/5
+    const val = (max * (5-i)/5).toFixed(0)
+    ctx.fillText(val, pad - 10, y + 4)
+  }
+}
+
+// 绘制饼图
+function drawPie(canvasId, data) {
+  const ctx = document.getElementById(canvasId).getContext('2d')
+  ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height)
+  
+  const cx = ctx.canvas.width/2, cy = ctx.canvas.height/2, r = 100
+  let total = data.reduce((s,d)=>s+d.val,0) || 1
+  let ang = -Math.PI/2
+  const colors = ['#3b82f6', '#f97316', '#10b981', '#8b5cf6', '#eab308', '#ef4444']
+
+  // 绘制饼图
+  data.forEach((item,i)=>{
+    const a = (item.val/total) * 2*Math.PI
+    ctx.fillStyle = colors[i%colors.length]
+    ctx.beginPath()
+    ctx.moveTo(cx,cy)
+    ctx.arc(cx,cy,r,ang,ang+a)
+    ctx.closePath()
+    ctx.fill()
+    
+    // 绘制分隔线
+    ctx.strokeStyle = '#fff'
+    ctx.lineWidth = 2
+    ctx.stroke()
+    
+    ang += a
+  })
+  
+  // 绘制中心圆
+  ctx.fillStyle = '#fff'
+  ctx.beginPath()
+  ctx.arc(cx,cy,40,0,Math.PI*2)
+  ctx.fill()
+  
+  // 绘制中心文字
+  ctx.fillStyle = '#1e293b'
+  ctx.font = '16px Microsoft YaHei'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText('销售占比', cx, cy - 10)
+  ctx.font = '20px Microsoft YaHei'
+  ctx.fontWeight = 'bold'
+  ctx.fillText(`${total.toFixed(0)}`, cx, cy + 10)
+  
+  // 绘制图例
+  ctx.fillStyle = '#1e293b'
+  ctx.font = '14px Microsoft YaHei'
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'middle'
+  
+  const legendTop = cy - 80
+  data.forEach((item,i)=>{
+    const y = legendTop + i*30
+    ctx.fillStyle = colors[i%colors.length]
+    ctx.fillRect(cx - 80, y - 8, 16, 16)
+    ctx.fillStyle = '#1e293b'
+    const percent = ((item.val/total)*100).toFixed(1)
+    ctx.fillText(`${item.name}: ${percent}%`, cx - 60, y)
+  })
+}
+
+// 初始化
+window.onload = function() {
+  // 默认显示首页，登录按钮可见
+  document.getElementById('loginBtn').style.display = 'flex'
+  goPage('home')
+}
+</script>
+</body>
+</html>
